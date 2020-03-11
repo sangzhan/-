@@ -1,0 +1,93 @@
+package agreement;
+
+import agreement.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static binaryToDecimalism.BinaryToDecimalish.binaryToDecimalish;
+import static binaryToDecimalism.BinaryToDecimalish.hexadecimalbinary;
+@WebServlet("/协议分析")
+public class analyzeServlet extends javax.servlet.http.HttpServlet {
+    public static String packet=null;
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.doGet(request,response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        List<Packages> list = new LinkedList<>();
+        int i = 0;
+        while (i < 100) {
+            try {
+                int id = -1;
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/Packet?useSSL=false", "root", "root");
+                Statement statement = connection.createStatement();
+                ResultSet s = statement.executeQuery("select * from Info where id in(select max(id) from Info) ");
+                while (s.next()) {
+                    packet = s.getString("packet");
+                    id = s.getInt("id");
+                }
+                statement.close();
+                Statement statement1 = connection.createStatement();
+                int row = statement1.executeUpdate("delete from Info where id = " + id + "");
+                statement.close();
+                connection.close();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            byte[] bytes = hexadecimalbinary(packet);
+            byte[] mac = Arrays.copyOfRange(bytes, 0, 112);
+            //ip层协议分析
+            int agreementnumber=binaryToDecimalish(Arrays.copyOfRange(bytes,112,116));
+            if(agreementnumber!=4){
+                continue;
+            }
+            int iplength = binaryToDecimalish(Arrays.copyOfRange(bytes, 116, 120))*32;
+            int ipbegin = 112;
+            int ipend = 112+ iplength;
+            byte[] ipArr = Arrays.copyOfRange(bytes, ipbegin, ipend);
+            int upperLayerProtocol = binaryToDecimalish(Arrays.copyOfRange(bytes, ipbegin + 72, ipbegin + 80));
+            IP.ip(ipArr);
+            //TCP协议分析
+            if (upperLayerProtocol == 6) {
+                int tcplength = binaryToDecimalish(Arrays.copyOfRange(bytes, ipend + 96, ipend + 96 + 4)) * 32;
+                int tcpbegin = ipend;
+                int tcpend = ipend + tcplength;
+                byte[] tcpArr = Arrays.copyOfRange(bytes, tcpbegin, tcpend);
+                TCP.tcp(tcpArr);
+            } else if (upperLayerProtocol == 1) {
+                //ICMP
+                byte[] icmpArr = Arrays.copyOfRange(bytes, ipend, ipend + 32);
+                ICMP.icmp(icmpArr);
+            } else if (upperLayerProtocol == 17) {
+                //UDP
+                byte[] udpArr = Arrays.copyOfRange(bytes, ipend, ipend + 64);
+                UDP.udp(udpArr);
+            }
+
+            Packages p = new Packages(Packages.Length, Packages.ipversions, Packages.ipheadLength,
+                    Packages.iptotalLength, Packages.ipidentificationNumber, Packages.ipsignnumber,
+                    Packages.ipSliceOffsetNUmber, Packages.ipagreement, Packages.ipheadCheckSum,
+                    Packages.ipdestinationaddress, Packages.ipsourceaddress, Packages.icmpType,
+                    Packages.icmpcode, Packages.icmpChecksum, Packages.tcpsourcePort,
+                    Packages.tcpdestinationPort, Packages.tcpserialNumber, Packages.tcpconfirmationNumber,
+                    Packages.tcpwindowSize, Packages.udpsourcePort, Packages.udpdestinationPort,
+                    Packages.udpLength, Packages.udpChecksum, Packages.response);
+            list.add(p);
+            i++;
+        }
+        request.setAttribute("list",list);
+        request.getRequestDispatcher("index.jsp").forward(request,response);
+    }
+}
