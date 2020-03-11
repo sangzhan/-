@@ -1,0 +1,101 @@
+package agreement;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+
+import static binaryToDecimalism.BinaryToDecimalish.binaryToDecimalish;
+
+public class IP {
+    public static String versions;
+    public static int headLength;
+    public static int totalLength;
+    public static int identificationNumber;
+    public static int signnumber;
+    public static int SliceOffsetNUmber;
+    public static String agreement;
+    public static int headCheckSum;
+    public static String destinationaddress;
+    public static String sourceaddress;
+
+    public static void ip(byte[] bytes) throws UnsupportedEncodingException {
+
+        byte[] versionsarr = Arrays.copyOfRange(bytes, 0, 4);
+        int versionsnum=binaryToDecimalish(versionsarr);
+        if(versionsnum==4){
+            versions="IPV4";
+        }
+        if(versionsnum==6){
+            versions="IPV6";
+        }
+        //System.out.println("版本：" + versions);
+
+        byte[] head = Arrays.copyOfRange(bytes, 4, 8);
+        headLength = binaryToDecimalish(head);
+        //System.out.println("首部长度：" + headLength);
+
+        byte[] Length = Arrays.copyOfRange(bytes, 16, 32);
+        totalLength = binaryToDecimalish(Length);
+        //System.out.println("总长度：" + totalLength);
+
+        byte[] identification = Arrays.copyOfRange(bytes, 32, 48);
+        identificationNumber = binaryToDecimalish(identification);
+        //System.out.println("标识：" + identificationNumber);
+
+        byte[] sign = Arrays.copyOfRange(bytes, 48, 51);
+        signnumber = binaryToDecimalish(sign);
+        // System.out.println("标志：" + signnumber);
+
+        byte[] SliceOffset = Arrays.copyOfRange(bytes, 51, 64);
+        SliceOffsetNUmber = binaryToDecimalish(SliceOffset);
+        //System.out.println("片偏移：" + SliceOffsetNUmber);
+
+        byte[] Agreement = Arrays.copyOfRange(bytes, 72, 80);
+        int agreementnum = binaryToDecimalish(Agreement);
+        if (agreementnum == 1) {
+            agreement="ICMP";
+        } else if (agreementnum == 6) {
+            agreement="TCP";
+        } else if (agreementnum == 17) {
+            agreement="UDP";
+        } else {
+            agreement="IP";
+        }
+
+        byte[]headChecknum=Arrays.copyOfRange(bytes,80,96);
+        headCheckSum = binaryToDecimalish(headChecknum);
+        //System.out.println("首部校验和：" + headCheckSum);
+
+        int[] sourceAddress = new int[4];
+        sourceAddress[0] = binaryToDecimalish(Arrays.copyOfRange(bytes, 96, 104));
+        sourceAddress[1] = binaryToDecimalish(Arrays.copyOfRange(bytes, 104, 112));
+        sourceAddress[2] = binaryToDecimalish(Arrays.copyOfRange(bytes, 112, 120));
+        sourceAddress[3] = binaryToDecimalish(Arrays.copyOfRange(bytes, 120, 128));
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < 4; i++) {
+            if (i == 3) {
+                sb.append(sourceAddress[i]);
+                break;
+            }
+            sb.append(sourceAddress[i]);
+            sb.append(":");
+        }
+        sourceaddress = sb.toString();
+
+        int[] destinationAddress = new int[4];
+        destinationAddress[0] = binaryToDecimalish(Arrays.copyOfRange(bytes, 128, 136));
+        destinationAddress[1] = binaryToDecimalish(Arrays.copyOfRange(bytes, 136, 144));
+        destinationAddress[2] = binaryToDecimalish(Arrays.copyOfRange(bytes, 144, 152));
+        destinationAddress[3] = binaryToDecimalish(Arrays.copyOfRange(bytes, 152, 160));
+        StringBuffer sb1 = new StringBuffer();
+        for (int i = 0; i < 4; i++) {
+            if (i == 3) {
+                sb1.append(destinationAddress[i]);
+                break;
+            }
+            sb1.append(destinationAddress[i]);
+            sb1.append(":");
+        }
+        destinationaddress = sb1.toString();
+
+    }
+}
