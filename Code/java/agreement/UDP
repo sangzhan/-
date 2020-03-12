@@ -1,0 +1,29 @@
+package agreement;
+
+import java.util.Arrays;
+
+import static binaryToDecimalism.BinaryToDecimalish.binaryToDecimalish;
+
+public class UDP {
+    public static int sourcePort;
+    public static int destinationPort;
+    public static int Length;
+    public static int Checksum;
+    public static void udp(byte[]udparr) {
+        byte[]sourceport= Arrays.copyOfRange(udparr,0,16);
+        sourcePort=binaryToDecimalish(sourceport);
+        //System.out.println("源端口："+udpsourcePort);
+
+        byte[]destinationport=Arrays.copyOfRange(udparr,16,32);
+        destinationPort=binaryToDecimalish(destinationport);
+        //System.out.println("目的端口："+udpdestinationPort);
+
+        byte[]length=Arrays.copyOfRange(udparr,32,48);
+        Length=binaryToDecimalish(length);
+        //System.out.println("长度："+udpLength);
+
+        byte[]checksum=Arrays.copyOfRange(udparr,48,64);
+        Checksum=binaryToDecimalish(checksum);
+        //System.out.println("校验和："+udpChecksum);
+    }
+}
