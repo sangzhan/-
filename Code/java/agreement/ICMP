@@ -1,0 +1,42 @@
+package agreement;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+
+import static binaryToDecimalism.BinaryToDecimalish.binaryToDecimalish;
+
+public class ICMP {
+    public static String Type;
+    public static String code;
+    public static int Checksum;
+    public static void icmp(byte[]icmpArr) throws UnsupportedEncodingException {
+        byte[]type= Arrays.copyOfRange(icmpArr,0,8);
+        int Typenum=binaryToDecimalish(type);
+        if(Typenum==3){
+           Type="终点不可达";
+        }
+        if(Typenum==11){
+            Type="时间超过";
+        }
+        if(Typenum==12){
+           Type="参数问题";
+        }
+        if(Typenum==5){
+            Type="改变路由";
+        }
+        if(Typenum==8||Typenum==0){
+            Type="回送请求或回答";
+        }
+        if(Typenum==13||Typenum==14){
+            Type="时间戳请求或回答";
+        }
+
+        code=new String(icmpArr,8,16-8,"UTF-8");
+        //System.out.println(code);
+
+        byte[]checksum=Arrays.copyOfRange(icmpArr,16,32);
+        Checksum=binaryToDecimalish(checksum);
+        //System.out.println("校验和："+Checksum);
+
+    }
+}
