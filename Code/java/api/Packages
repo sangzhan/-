@@ -1,0 +1,63 @@
+package agreement;
+
+import binaryToDecimalism.BinaryToDecimalish;
+
+public class Packages {
+    public  String response;//拿到的包
+    public  int Length;
+    public  String ipversions;
+    public  int ipheadLength;
+    public  int iptotalLength;
+    public  int ipidentificationNumber;
+    public  int ipsignnumber;
+    public  int ipSliceOffsetNUmber;
+    public  String ipagreement;
+    public  int ipheadCheckSum;
+    public  String ipdestinationaddress;
+    public  String ipsourceaddress;
+    public  String icmpType;
+    public  String icmpcode;
+    public  int icmpChecksum;
+    public  int tcpsourcePort;
+    public  int tcpdestinationPort;
+    public  int tcpserialNumber;
+    public  int tcpconfirmationNumber;
+    public  int tcpwindowSize;
+    public  int udpsourcePort;
+    public  int udpdestinationPort;
+    public  int udpLength;
+    public  int udpChecksum;
+
+
+    public Packages(int length, String versions, int headLength, int totalLength, int identificationNumber, int signnumber,
+                    int SliceOffsetNUmber, String agreement, int headCheckSum, String destinationaddress, String sourceaddress,
+                    String Type, String code, int Checksum, int sourcePort, int destinationPort, int serialNumber, int confirmationNumber,
+                    int windowSize, int udsourcePort, int uddestinationPort, int udLength, int udChecksum, String Response){
+        response= ServletTest.packet;
+        Length= BinaryToDecimalish.length;
+        ipversions= IP.versions;
+        ipheadLength= IP.headLength;
+        iptotalLength= IP.totalLength;
+        ipidentificationNumber= IP.identificationNumber;
+        ipsignnumber= IP.signnumber;
+        ipSliceOffsetNUmber= IP.SliceOffsetNUmber;
+        ipagreement = IP.agreement;
+        ipheadCheckSum= IP.headCheckSum;
+        ipdestinationaddress = IP.destinationaddress;
+        ipsourceaddress = IP.sourceaddress;
+        icmpType= ICMP.Type;
+        icmpcode= ICMP.code;
+        icmpChecksum= ICMP.Checksum;
+        tcpsourcePort= TCP.sourcePort;
+        tcpdestinationPort= TCP.destinationPort;
+        tcpserialNumber= TCP.serialNumber;
+        tcpconfirmationNumber= TCP.confirmationNumber;
+        tcpwindowSize= TCP.windowSize;
+        udpsourcePort= UDP.sourcePort;
+        udpdestinationPort= UDP.destinationPort;
+        udpLength= UDP.Length;
+        udpChecksum= UDP.Checksum;
+
+
+    }
+}
